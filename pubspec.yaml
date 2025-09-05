@@ -6,46 +6,38 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.19.0 <3.0.0"
 
-
 dependencies:
-  flutter:       # CRITICAL: Required for every Flutter project - DO NOT REMOVE
-    sdk: flutter # CRITICAL: Required for every Flutter project - DO NOT REMOVE
+  flutter:       
+    sdk: flutter 
   
-  # CRITICAL: Core UI and responsive design - DO NOT REMOVE OR MODIFY
-  sizer: ^2.0.15              # Required for responsive design system
-  flutter_svg: ^2.0.9        # Required for SVG icon support
-  google_fonts: ^6.1.0       # Required for typography (replaces local fonts)
-  shared_preferences: ^2.2.2 # Required for local data storage
-  web: ^1.1.1
+  # Core UI and responsive design
+  sizer: ^2.0.15              
+  flutter_svg: ^2.0.9        
+  google_fonts: ^4.0.4       # Last Dart 2 compatible version
+  shared_preferences: ^2.0.15
+  web: ^0.4.0  # Dart 2 compatible version
   
-  # Feature dependencies - safe to modify
-  cached_network_image: ^3.3.1
-  connectivity_plus: ^6.1.4
-  dio: ^5.4.0
-  fluttertoast: ^8.2.4
-  fl_chart: ^0.65.0
-  camera: ^0.10.5+5
-  permission_handler: ^11.1.0
-  mobile_scanner: ^7.0.0-beta.8
-  universal_html: ^2.2.4
-  path_provider: ^2.1.2
-  flutter_slidable: ^4.0.1
-  supabase_flutter: ^2.10.0
+  # Feature dependencies
+  cached_network_image: ^3.2.3
+  connectivity_plus: ^3.0.3
+  dio: ^4.0.6
+  fluttertoast: ^8.0.9
+  fl_chart: ^0.55.2
+  camera: ^0.10.0+4
+  permission_handler: ^10.2.0
+  mobile_scanner: ^2.0.0
+  universal_html: ^2.0.8
+  path_provider: ^2.0.14
+  flutter_slidable: ^2.0.0
+  supabase_flutter: ^1.10.25  # Dart 2 compatible
 
 dev_dependencies:
-  flutter_test:    # CRITICAL: Required for Flutter project testing - DO NOT REMOVE
-    sdk: flutter   # CRITICAL: Required for Flutter project testing - DO NOT REMOVE
-  flutter_lints: ^2.0.1 # CRITICAL: Required for code quality - DO NOT REMOVE
+  flutter_test:
+    sdk: flutter   
+  flutter_lints: ^2.0.1 
 
 flutter:
-  uses-material-design: true # CRITICAL: Required for Material icon font - DO NOT REMOVE
+  uses-material-design: true 
   assets:
     - assets/
     - assets/images/
-  # CRITICAL ASSET MANAGEMENT RULES:
-  # - DO NOT ADD NEW ASSET DIRECTORIES (assets/svg/, assets/icons/, etc.)
-  # - ONLY USE EXISTING AND ITEMS AVAILABLE IN THE DIRECTORIES LISTED ABOVE (assets/, assets/images/)
-  
-  # CRITICAL FONTS RULE: 
-  # - THIS PROJECT USES GOOGLE FONTS INSTEAD OF LOCAL FONTS
-  # - DO NOT ADD ANY LOCAL FONTS SECTION OR FONT FILES
