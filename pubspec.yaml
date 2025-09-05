@@ -12,10 +12,10 @@ dependencies:
   
   # Core UI and responsive design
   sizer: ^2.0.15              
-  flutter_svg: ^2.0.9        
-  google_fonts: ^4.0.4       # Last Dart 2 compatible version
+  flutter_svg: ^1.1.6        # Dart 2 compatible
+  google_fonts: ^4.0.4       # Dart 2 compatible
   shared_preferences: ^2.0.15
-  web: ^0.4.0  # Dart 2 compatible version
+  web: ^0.3.0                 # ✅ Dart 2 compatible version
   
   # Feature dependencies
   cached_network_image: ^3.2.3
