@@ -12,8 +12,16 @@ void main() async {
   // Initialize Supabase
   try {
     await SupabaseService.initialize();
+    debugPrint('✅ Supabase initialized successfully');
+
+    // Test query to check connection
+    final response = await SupabaseService.instance.client
+        .from('user_profiles')
+        .select();
+    debugPrint('📦 User Profiles: $response');
+
   } catch (e) {
-    debugPrint('Failed to initialize Supabase: $e');
+    debugPrint('❌ Failed to initialize Supabase: $e');
   }
 
   bool _hasShownError = false;
@@ -23,7 +31,6 @@ void main() async {
     if (!_hasShownError) {
       _hasShownError = true;
 
-      // Reset flag after 3 seconds to allow error widget on new screens
       Future.delayed(Duration(seconds: 5), () {
         _hasShownError = false;
       });
@@ -52,7 +59,6 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
-        // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
@@ -61,7 +67,6 @@ class MyApp extends StatelessWidget {
             child: child!,
           );
         },
-        // 🚨 END CRITICAL SECTION
         debugShowCheckedModeBanner: false,
         routes: AppRoutes.routes,
         initialRoute: AppRoutes.initial,
