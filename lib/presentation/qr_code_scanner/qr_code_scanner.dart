@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:wifi_info_flutter/wifi_info_flutter.dart';
 
 import '../../core/app_export.dart';
 import './widgets/camera_overlay_widget.dart';
@@ -32,6 +34,12 @@ class _QrCodeScannerState extends State<QrCodeScanner>
   String? _errorMessage;
   String? _scannedEmployeeName;
   bool _isProcessingCode = false;
+
+  // Allowed location & WiFi settings
+  static const double allowedLat = 37.4219983; // change to your location
+  static const double allowedLng = -122.084;   // change to your location
+  static const double allowedRadiusMeters = 50;
+  static const String allowedWifi = "Your_WiFi_Name"; // change to your WiFi SSID
 
   // Mock attendance data
   final Map<String, Map<String, dynamic>> _attendanceData = {
@@ -104,7 +112,53 @@ class _QrCodeScannerState extends State<QrCodeScanner>
     }
   }
 
+  Future<bool> _checkLocationAndWifi() async {
+    try {
+      // Request location permission
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        setState(() => _errorMessage = "Location permission denied");
+        return false;
+      }
+
+      // Get current location
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // Check distance
+      double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        allowedLat,
+        allowedLng,
+      );
+      if (distance > allowedRadiusMeters) {
+        setState(() =>
+            _errorMessage = "You are not in the allowed location range");
+        return false;
+      }
+
+      // WiFi check
+      final wifiInfo = WifiInfo();
+      String? ssid = await wifiInfo.getWifiName();
+      if (ssid == null || !ssid.contains(allowedWifi)) {
+        setState(() =>
+            _errorMessage = "Please connect to the allowed WiFi network");
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      setState(() => _errorMessage = "Error checking location/WiFi");
+      return false;
+    }
+  }
+
   Future<void> _initializeScanner() async {
+    bool isAllowed = await _checkLocationAndWifi();
+    if (!isAllowed) return;
+
     try {
       final hasPermission = await _requestCameraPermission();
 
@@ -163,24 +217,19 @@ class _QrCodeScannerState extends State<QrCodeScanner>
       _errorMessage = null;
     });
 
-    // Haptic feedback
     HapticFeedback.mediumImpact();
 
     try {
-      // Simulate network delay
       await Future.delayed(const Duration(milliseconds: 800));
 
-      // Check if code exists in mock data
       final employeeData = _attendanceData[code];
 
       if (employeeData != null) {
-        // Success - show animation
         setState(() {
           _scannedEmployeeName = employeeData['name'] as String;
           _showSuccessAnimation = true;
         });
       } else {
-        // Invalid QR code
         setState(() {
           _errorMessage =
               'Invalid QR code. Please try again or use manual entry.';
@@ -206,9 +255,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
       setState(() {
         _isFlashOn = !_isFlashOn;
       });
-    } catch (e) {
-      // Flash not supported on this device
-    }
+    } catch (e) {}
   }
 
   void _showManualEntryDialog() {
@@ -265,7 +312,6 @@ class _QrCodeScannerState extends State<QrCodeScanner>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Camera preview or placeholder
           if (_isInitialized && _hasPermission && _scannerController != null)
             MobileScanner(
               controller: _scannerController!,
@@ -287,7 +333,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      'Initializing Camera...',
+                      _errorMessage ?? 'Initializing Camera...',
                       style: AppTheme.darkTheme.textTheme.bodyLarge?.copyWith(
                         color: AppTheme.textMediumEmphasisDark,
                         fontSize: 16.sp,
@@ -298,7 +344,6 @@ class _QrCodeScannerState extends State<QrCodeScanner>
               ),
             ),
 
-          // Camera overlay
           if (_isInitialized && _hasPermission)
             CameraOverlayWidget(
               isScanning: _isScanning,
@@ -308,7 +353,6 @@ class _QrCodeScannerState extends State<QrCodeScanner>
               onManualEntry: _showManualEntryDialog,
             ),
 
-          // Processing indicator
           if (_isProcessingCode)
             Container(
               width: double.infinity,
@@ -349,7 +393,6 @@ class _QrCodeScannerState extends State<QrCodeScanner>
               ),
             ),
 
-          // Error message
           if (_errorMessage != null)
             ErrorMessageWidget(
               message: _errorMessage!,
@@ -361,21 +404,18 @@ class _QrCodeScannerState extends State<QrCodeScanner>
               },
             ),
 
-          // Success animation
           if (_showSuccessAnimation && _scannedEmployeeName != null)
             SuccessAnimationWidget(
               employeeName: _scannedEmployeeName!,
               onComplete: _onSuccessComplete,
             ),
 
-          // Manual entry dialog
           if (_showManualEntry)
             ManualEntryDialogWidget(
               onSubmit: _onManualCodeSubmit,
               onCancel: _hideManualEntryDialog,
             ),
 
-          // Permission dialog
           if (_showPermissionDialog)
             PermissionDialogWidget(
               onAllow: _onPermissionAllow,
