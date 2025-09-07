@@ -41,3 +41,6 @@ flutter:
   assets:
     - assets/
     - assets/images/
+dependencies:
+  geolocator: ^9.0.2
+  wifi_info_flutter: ^2.0.2
